@@ -166,7 +166,11 @@ class Validate(ValidateBase):
             elif draft == "draft6":
                 validator = jsonschema.Draft6Validator(criteria)
             else:
-                validator = jsonschema.Draft7Validator(criteria)
+                schema_store = {
+                    criteria['$id']: criteria
+                }
+                resolver = jsonschema.RefResolver.from_schema(criteria, store=schema_store)
+                validator = jsonschema.Draft7Validator(criteria, resolver=resolver)
 
             validation_errors = sorted(
                 validator.iter_errors(self._data), key=lambda e: e.path
